@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="btn clear" onclick="clearDisplay()">AC</button>
+            <button class="btn function" onclick="applyPercentage()">%</button>
+            <button class="btn function" onclick="applySquareRoot()">√</button>
+            <button class="btn operator" onclick="appendToDisplay('/')">÷</button>
+            
+            <button class="btn" onclick="appendToDisplay('7')">7</button>
+            <button class="btn" onclick="appendToDisplay('8')">8</button>
+            <button class="btn" onclick="appendToDisplay('9')">9</button>
+            <button class="btn operator" onclick="appendToDisplay('*')">×</button>
+            
+            <button class="btn" onclick="appendToDisplay('4')">4</button>
+            <button class="btn" onclick="appendToDisplay('5')">5</button>
+            <button class="btn" onclick="appendToDisplay('6')">6</button>
+            <button class="btn operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button class="btn" onclick="appendToDisplay('1')">1</button>
+            <button class="btn" onclick="appendToDisplay('2')">2</button>
+            <button class="btn" onclick="appendToDisplay('3')">3</button>
+            <button class="btn operator" onclick="appendToDisplay('+')">+</button>
+
+            <button class="btn" onclick="appendToDisplay('0')">0</button>
+            <button class="btn" onclick="appendToDisplay('.')">.</button>
+            <button class="btn equal" onclick="calculateResult()">=</button>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        let currentInput = '0';
+        function updateDisplay() {
+            display.innerText = currentInput;
+        }
+        function clearDisplay() {
+            currentInput = '0';
+            updateDisplay();
+        }
+        function isOperator(char) {
+            return ['+', '-', '*', '/'].includes(char);
+        }
+        function appendToDisplay(value) {
+            if (display.innerText === 'Error') {
+                clearDisplay();
+            }
+            if (!isOperator(value)) {
+                if (currentInput === '0' && value !== '.') {
+                    currentInput = value;
+                } else if (value === '.' && currentInput.includes('.')) {
+                    return;
+                } else {
+                    currentInput += value;
+                }
+            } 
+            else {
+                if (currentInput === '0' && value !== '-') return;
+                if (isOperator(currentInput.slice(-1))) {
+                    currentInput = currentInput.slice(0, -1) + value;
+                } else {
+                    currentInput += value;
+                }
+            }
+            updateDisplay();
+        }
+        function applyPercentage() {
+            if (display.innerText === 'Error') return;
+            try {
+                let currentValue = parseFloat(currentInput);
+                if (isNaN(currentValue)) {
+                    currentValue = eval(currentInput.replace(/÷/g, '/').replace(/×/g, '*'));
+                }
+                let result = currentValue / 100;
+                currentInput = String(result);
+                updateDisplay();
+            } catch (e) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+        function applySquareRoot() {
+            if (display.innerText === 'Error') return;
+            try {
+                let currentValue = parseFloat(currentInput);
+                if (isNaN(currentValue)) {
+                    currentValue = eval(currentInput.replace(/÷/g, '/').replace(/×/g, '*'));
+                }
+                if (currentValue < 0) {
+                    currentInput = 'Error (Neg Root)';
+                } else {
+                    let result = Math.sqrt(currentValue);
+                    if (result % 1 !== 0) {
+                        result = parseFloat(result.toFixed(8));
+                    }
+                    currentInput = String(result);
+                }
+                updateDisplay();
+            } catch (e) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+        function calculateResult() {
+            if (display.innerText === 'Error') return;
+            try {
+                let expression = currentInput.replace(/÷/g, '/').replace(/×/g, '*');
+                while (isOperator(expression.slice(-1))) {
+                    expression = expression.slice(0, -1);
+                }
+
+                let result = eval(expression); 
+                if (result % 1 !== 0) {
+                    result = parseFloat(result.toFixed(8));
+                }
+                currentInput = String(result);
+                updateDisplay();
+            } catch (e) {
+                currentInput = 'Error';
+                updateDisplay();
+            }
+        }
+        updateDisplay();
+    </script>
+</body>
+</html>
